@@ -5,6 +5,7 @@ var disqus_shortname = "";
 var disqus_identifier = "";
 var disqus_url = "";
 
+var monthNames = ["Jan","feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 $(document).ready(function(){
     commentbody = $("#bodycomment").html();
@@ -51,9 +52,16 @@ $(document).ready(function(){
     
     $("#frmSearch").submit(function(event){
         event.preventDefault();
+        spage=0;
         fetchSearch(spage);
     });
     
+    $(document).on("click","#q+.ui-input-clear",function(){
+        $("#searchlist").html("");
+        spage=0;
+        $("#nextspagination").addClass("ui-disabled");
+        $("#prevspagination").addClass("ui-disabled");
+    });
     
     $("#nextpagination").addClass("ui-disabled");
     $("#prevpagination").addClass("ui-disabled");
@@ -82,10 +90,13 @@ function fetchSearch(p){
 
 function refreshNewsList(data)
 {
-    $("#content").html('<ul data-role="listview" id="articlelist"></ul>');
+    //$("#content").html('<ul data-role="listview" id="articlelist"></ul>');
+    $("#articlelist").html("");
     $.each(data.items,function(i,item){
         var lst = $("<li data-articleid='"+item.id+"'></li>").appendTo($("#articlelist"));
         lst = $('<a href="#newsContent" title="'+(item.title!==null?item.title:item.body.toString().replace(/(<([^>]+)>)/ig,"").substr(0,100).trim())+'"></a>').appendTo(lst);
+        var dd = new Date(item.pubdate);
+        $('<p class="ui-li-aside">'+monthNames[dd.getMonth()]+' '+dd.getDay()+'</p>').appendTo(lst);
         if(item.img !== "")
         {
             var imglist = item.img.split(",");
@@ -104,9 +115,10 @@ function refreshNewsList(data)
         lst.append('<h2>'+(item.title!==null?item.title:item.body.toString().replace(/(<([^>]+)>)/ig,"").substr(0,100).trim())+'</h2>');
         lst.append('<p>'+item.body.toString().replace(/(<([^>]+)>)/ig,"").substr(0,250).trim()+'&hellip;</p>');
     });
-    $("#content").trigger("create");
+    //$("#content").trigger("create");
+    $("#articlelist").listview("refresh");
     $("#nextpagination").removeClass("ui-disabled");
-    if(spage>=limit){
+    if(page>=limit){
         $("#prevpagination").removeClass("ui-disabled");
     }
     $.mobile.loading('hide');
