@@ -1,4 +1,4 @@
-var page=0, limit=10;
+var page=0, limit=10, spage=0;
 var commentbody="";
 
 var disqus_shortname = "";
@@ -24,7 +24,23 @@ $(document).ready(function(){
         }
         fetchNews(page-=limit);
     });
-    $(document).on("click","#articlelist li",function(e){
+    
+    $("#nextspagination").click(function(){
+        $("#nextspagination").addClass("ui-disabled");
+        $("#prevspagination").addClass("ui-disabled");
+        fetchSearch(spage+=limit);
+    });
+    $("#prevspagination").click(function(){
+        $("#nextspagination").addClass("ui-disabled");
+        $("#prevspagination").addClass("ui-disabled");
+        if(spage<limit)
+        {
+            spage=limit;
+        }
+        fetchSearch(spage-=limit);
+    });
+    
+    $(document).on("click","#articlelist li, #searchlist li",function(e){
         $.mobile.loading('show');
         e.preventDefault();
         $.getJSON("http://www.quezon.gov.ph/json/?callback=?",
@@ -33,9 +49,16 @@ $(document).ready(function(){
         },displayNews);
     });
     
+    $("#frmSearch").submit(function(event){
+        event.preventDefault();
+        fetchSearch(spage);
+    });
+    
     
     $("#nextpagination").addClass("ui-disabled");
     $("#prevpagination").addClass("ui-disabled");
+    $("#nextspagination").addClass("ui-disabled");
+    $("#prevspagination").addClass("ui-disabled");
     fetchNews(page);
 });
 
@@ -47,6 +70,16 @@ function fetchNews(p){
             "limit": limit
         },refreshNewsList);
 }
+
+function fetchSearch(p){
+    $.mobile.loading('show');
+        $.getJSON("http://www.quezon.gov.ph/json/?callback=?",
+        {
+            "q": $("#q").val(),
+            "page": p
+        },displaySearch);
+}
+
 function refreshNewsList(data)
 {
     $("#content").html('<ul data-role="listview" id="articlelist"></ul>');
@@ -56,8 +89,13 @@ function refreshNewsList(data)
         if(item.img !== "")
         {
             var imglist = item.img.split(",");
-            var url = encodeURIComponent('http://www.quezon.gov.ph/news2010/images/092010/' + imglist[1]);
-            lst.append('<img src="http://www.quezon.gov.ph/timthumb.php?w=80&amp;h=80&amp;q=60&amp;src='+url+'" alt="'+item.title+'"/>');
+            $.each(imglist,function(j,img){
+                if(img){
+                    var url = encodeURIComponent('http://www.quezon.gov.ph/news2010/images/092010/' + img);
+                    lst.append('<img src="http://www.quezon.gov.ph/timthumb.php?w=80&amp;h=80&amp;q=60&amp;src='+url+'" alt="'+item.title+'"/>');
+                    return false;
+                }
+            });
         }
         else
         {
@@ -68,8 +106,40 @@ function refreshNewsList(data)
     });
     $("#content").trigger("create");
     $("#nextpagination").removeClass("ui-disabled");
-    if(page>=limit){
+    if(spage>=limit){
         $("#prevpagination").removeClass("ui-disabled");
+    }
+    $.mobile.loading('hide');
+}
+
+function displaySearch(data)
+{
+    $("#searchlist").html("");
+    $.each(data.items,function(i,item){
+        var lst = $("<li data-articleid='"+item.id+"'></li>").appendTo($("#searchlist"));
+        lst = $('<a href="#newsContent" title="'+(item.title!==null?item.title:item.body.toString().replace(/(<([^>]+)>)/ig,"").substr(0,100).trim())+'"></a>').appendTo(lst);
+        if(item.img !== "")
+        {
+            var imglist = item.img.split(",");            
+            $.each(imglist,function(j,img){
+                if(img){
+                    var url = encodeURIComponent('http://www.quezon.gov.ph/news2010/images/092010/' + img);
+                    lst.append('<img src="http://www.quezon.gov.ph/timthumb.php?w=80&amp;h=80&amp;q=60&amp;src='+url+'" alt="'+item.title+'"/>');
+                    return false;
+                }
+            });
+        }
+        else
+        {
+            lst.append('<img src="http://www.quezon.gov.ph/images/quezonseal.png" alt="'+item.title+'"/>');
+        }
+        lst.append('<h2>'+(item.title!==null?item.title:item.body.toString().replace(/(<([^>]+)>)/ig,"").substr(0,100).trim())+'</h2>');
+        lst.append('<p>'+item.body.toString().replace(/(<([^>]+)>)/ig,"").substr(0,250).trim()+'&hellip;</p>');
+    });
+    $("#searchlist").listview("refresh");
+    $("#nextspagination").removeClass("ui-disabled");
+    if(spage>=limit){
+        $("#prevspagination").removeClass("ui-disabled");
     }
     $.mobile.loading('hide');
 }

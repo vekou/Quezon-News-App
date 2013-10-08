@@ -23,8 +23,8 @@
             </h1>
             <div data-role="navbar">
                 <ul>
-                    <li><a href="#" data-icon="home">Home</a></li>
-                    <li><a href="#" data-icon="search">Search</a></li>
+                    <li><a href="#newsList" data-icon="home">Home</a></li>
+                    <li><a href="#searchNews" data-icon="search">Search</a></li>
                     <li><a href="#" data-icon="info">About</a></li>
                 </ul>
             </div>
@@ -64,6 +64,39 @@
         </div><!-- /content -->
 
         <div data-role="footer">
+            <h6>&copy; 2013 Provincial Government of Quezon</h6>
+        </div><!-- /footer -->
+    </div><!-- /page -->
+    
+    <div data-role="page" data-theme="a" id="searchNews">
+        <div data-role="header" data-theme="a">
+            <h1>
+                <div><img src="http://www.quezon.gov.ph/timthumb.php?w=48&amp;q=60&amp;src=http%3A%2F%2Fwww.quezon.gov.ph%2Fimages%2Fquezonseal.png" alt="Quezon Seal"/></div>
+                Quezon Province News
+            </h1>
+            <div data-role="navbar">
+                <ul>
+                    <li><a href="#newsList" data-icon="home">Home</a></li>
+                    <li><a href="#searchNews" data-icon="search">Search</a></li>
+                    <li><a href="#" data-icon="info">About</a></li>
+                </ul>
+            </div>
+        </div><!-- /header -->
+
+        <div data-role="content" id="searchcontent">
+            <form action="javascript:alert('Form')" id="frmSearch">
+                <input type="search" id="q" name="q" placeholder="Search News"/>
+            </form>
+            <ul data-role="listview" id="searchlist" data-inset='true'></ul>
+        </div><!-- /content -->
+
+        <div data-role="footer">
+            <div data-role="navbar" data-iconpos="left">
+                <ul>
+                    <li><a href="#" data-icon="arrow-l" id="prevspagination">Back</a></li>
+                    <li><a href="#" data-icon="arrow-r" id="nextspagination">Next</a></li>
+                </ul>
+            </div>
             <h6>&copy; 2013 Provincial Government of Quezon</h6>
         </div><!-- /footer -->
     </div><!-- /page -->
